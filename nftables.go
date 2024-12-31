@@ -21,6 +21,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os/exec"
 	"strings"
 	"sync"
@@ -58,6 +59,8 @@ type Interface interface {
 	// be "set" or "map".) If the set/map exists but contains no elements, this will
 	// return an empty list and no error.
 	ListElements(ctx context.Context, objectType, name string) ([]*Element, error)
+
+	Monitor(ctx context.Context) (io.ReadCloser, error)
 }
 
 type nftContext struct {
@@ -511,4 +514,12 @@ func parseElementValue(json interface{}) ([]string, error) {
 	}
 
 	return nil, fmt.Errorf("could not parse element value %q", json)
+}
+
+func (nft *realNFTables) Monitor(ctx context.Context) (io.ReadCloser, error) {
+	cmd := exec.CommandContext(ctx, nft.path, "monitor")
+	if err := cmd.Start(); err != nil {
+		return nil, fmt.Errorf("failed to exec nft monitor: %w", err)
+	}
+	return cmd.StdoutPipe()
 }

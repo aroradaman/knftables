@@ -19,6 +19,7 @@ package knftables
 import (
 	"context"
 	"fmt"
+	"io"
 	"reflect"
 	"regexp"
 	"sort"
@@ -45,6 +46,11 @@ type Fake struct {
 	// next time Run() is called. (It is not affected by Check().)
 	// Make sure to acquire Fake.RLock before accessing LastTransaction in a concurrent environment.
 	LastTransaction *Transaction
+}
+
+func (fake *Fake) Monitor(ctx context.Context) (io.ReadCloser, error) {
+	//TODO implement me
+	panic("implement me")
 }
 
 // FakeTable wraps Table for the Fake implementation
